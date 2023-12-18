@@ -79,7 +79,7 @@ print(''' Welcome to
                              "Y88P"                               
       ''')
 
-print(f"Debugging: {random_word}")
+#print(f"Debugging: {random_word}")
 
 
 for _ in range(word_length):

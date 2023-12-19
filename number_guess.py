@@ -2,14 +2,14 @@ import random
 
 #random num variable and lives variable
 random_number = random.randint(0, 100)
-lives = 3
+lives = 10
 
 #Welcome message
 print('''Welcome to the number guessing game!
 The rules are simple: Guess the random number.\n''')
 
 #debug printing of the number
-print(f"Debug: {random_number}")
+#print(f"Debug: {random_number}")
 
 #Provides player hint on whether number is greater or less than 50
 def high_low():

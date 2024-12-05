@@ -1,5 +1,6 @@
 import random
 import time
+import os
 import re
 import msvcrt # Windoes-only library
 import tkinter as tk
@@ -9,7 +10,7 @@ import textwrap
 
 # generates random 50-word paragraph using a text corpus
 def generate_paragraph():
-    with open('text_file.txt', 'r') as f:
+    with open(r"C:\Users\zallen\Python_Coding\Typing_Test\text_file.txt", 'r') as f:
         text = f.read()
     words = text.split()
     random.shuffle(words)
@@ -117,42 +118,34 @@ class TypingTestApp:
 
 
     def check_spelling(self, event):
-        # highlight misspelled words
-        self.text_box.tag_remove('misspelled', '1.0', tk.END) # remove previous tags
-        
+        # We only check spelling when the user types a space or punctuation, not every keystroke
         if event.keysym in ('space', 'Return', 'period', 'comma', 'question', 'exclam'):
-            user_input = self.text_box.get("1.0", tk.END).strip()
-            user_words = user_input.split()
-            paragraph_words = self.cleaned_paragraph.split()
+            # Remove previous misspelled word highlights
+            self.text_box.tag_remove('misspelled', '1.0', tk.END)
 
-            # iterate through words and highlight misspelled ones
+            # Get the current text input
+            user_input = self.text_box.get("1.0", tk.END).strip()
+            user_words = user_input.split()  # Split by spaces to get the typed words
+            paragraph_words = self.cleaned_paragraph.split()  # Split the reference paragraph into words
+
+            # Iterate through user words and check for misspelled ones
             current_index = '1.0'
             for i, word in enumerate(user_words):
                 if i < len(paragraph_words) and word != paragraph_words[i]:
-                    #find start and end index of the word
+                    # Find the start index of the word
                     start_idx = self.text_box.search(word, current_index, stopindex=tk.END)
-                    end_idx = self.text_box.index(f"{start_idx} + {len(word)}c")
+                    if start_idx:
+                        # Calculate the end index based on the word's length
+                        end_idx = self.text_box.index(f"{start_idx} + {len(word)}c")
+                        # Tag the misspelled word to highlight it
+                        self.text_box.tag_add('misspelled', start_idx, end_idx)
 
-                    self.text_box.tag_add('misspelled', start_idx, end_idx)
-                current_index = self.text_box.index(f"{current_index} + {len(word)+1}c")
+                    # Update the current index to the next word's start position
+                    current_index = self.text_box.index(f"{start_idx} + {len(word)}c")
+
+            # Make misspelled words red
             self.text_box.tag_config('misspelled', foreground='red')
 
-        # re-check spelling on backspace
-        elif event.keysym == 'BackSpace':
-            user_input = self.text_box.get("1.0", tk.END).strip()
-            user_words = user_input.split()
-            paragraph_words = self.cleaned_paragraph.split()
-
-            current_index = '1.0'
-            for i, word in enumerate(user_words):
-                if i < len(paragraph_words) and word!= paragraph_words[i]:
-                    start_idx = self.text_box.search(word, current_index, stopindex=tk.END)
-                    end_idx = self.text_box.index(f"{start_idx} + {len(word)}c")
-
-                    self.text_box.tag_add('misspelled', start_idx, end_idx)
-                current_index = self.text_box.index(f"{current_index} + {len(word)+1}c")
-
-        self.text_box.tag_config('misspelled', foreground='red')
 
 
     def restart_test(self):
